@@ -40,11 +40,13 @@ require('zappa') '127.0.0.1', port, ->
 
   @configure =>
 
+    @set 'views': "#{__dirname}/../views"
+
     @enable 'serve jquery'
 
     @use @express.logger('dev'), 'bodyParser'
     @use 'cookieParser', cookiesnatch, fileSession, sqlSession
-    @use @app.router, @express.static("#{__dirname}/public")
+    @use @app.router, @express.static("#{__dirname}/../public")
 #      @use require('connect-assets')() ??
 
   @configure
