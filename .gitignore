@@ -1,2 +1,3 @@
 *.swp
+/public/*template.js
 /node_modules
