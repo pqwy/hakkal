@@ -65,8 +65,8 @@ module.exports = ({ database, user, password }) ->
 #    daySet         : dayput
 
 
-module.exports.x = module.exports
-                      database : 'wiki'
-                      user     : 'wiki'
-                      password : 'stonogA1.'
+#  module.exports.x = module.exports
+#                        database : 'wiki'
+#                        user     : 'wiki'
+#                        password : 'stonogA1.'
 

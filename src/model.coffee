@@ -38,14 +38,13 @@ resolveday = (client, userid, date, next) ->
 
   today = Date.normalizedToday()
 
-  client.query_t q, [date.localeISODateString()], ([res]) ->
+  client.query_t q, [ date.localeISODateString() ], ([res]) ->
 
     r =
       day: date.toDict()
 
     if res?
-      r.user   = res.user_name
-      r.name   = res.user_real_name
+      [ r.user, r.name ] = [ res.user_name, res.user_real_name ]
       r.status = if res.user_id == userid then 'own' else 'taken'
     else
       r.status = 'available'
@@ -54,7 +53,7 @@ resolveday = (client, userid, date, next) ->
     r.distant = true if refmonth? and refmonth isnt date.getMonth()
     r.future  = true if r.today? or date > today
 
-    if date.getDay() in [0, 6] then r.status = 'blocked'
+    if date.getWeekday() in [5, 6] then r.status = 'blocked'
 
     next r
 
