@@ -10,11 +10,11 @@ div id: 'container', ->
 
     div id: 'logo'
 
-    h5 ->
+    h5 id: 'title', ->
 
       text 'Kalendar za dežurstva &nbsp;|'
       div class: 'strelica', id: 'prev'
-      span id: 'monthname'
+      span id: 'monthname'; text '&nbsp;'; span id: 'yearname'
       div class: 'strelica', id: 'next'
       text '|'
 

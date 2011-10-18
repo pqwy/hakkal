@@ -53,6 +53,10 @@ span.dayname {
     margin: 0 0 5px 0;
 }
 
+#title span, span.dayname {
+    text-transform: lowercase;
+}
+
 li {
     margin:0px 5px;
     display: inline;
@@ -75,10 +79,10 @@ li {
     margin:5px 0 25px 0;
 }
 
-#current {
+.current {
    -webkit-box-shadow: 0 3px 9px #8EEB00;
    -moz-box-shadow: 0 3px 9px #8EEB00;
-    box-shadow: 0 3px 9px #8EEB00;             
+    box-shadow: 0 3px 9px #8EEB00 !important;
 }
 
 #container {

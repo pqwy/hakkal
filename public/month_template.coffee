@@ -9,17 +9,20 @@ for week in month
       for d in week
         li ->
 
-          [outer, inner, info] = 
+          [outer, inner, info] =
 
             switch d.status
+              when 'taken'       then [d.status    , 'info'   , d.name]
+              when 'own'         then ['taken.own' , 'info'   , d.name]
+              when 'blocked'     then [d.status    , 'noway'  , ''    ]
+              when 'available'   then [d.status    , 'action' , ''    ]
 
-              when 'own','taken' then ['taken','info',d.name]
+          spec =        ".#{outer}"
+          spec = spec + '.future'      if d.future?
+          spec = spec + '.current'     if d.today?
+          spec =        '.unimportant' if d.distant?
 
-              when 'blocked'     then [d.status,'noway','']
-
-              when 'available'   then [d.status,'action','']
-
-          div class: outer, ->
+          div spec, ->
 
             text "#{d.day.day} "
             span class: 'dayname', "| #{d.day.dayname} |"
