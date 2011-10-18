@@ -59,18 +59,3 @@ Date::firstInWeek = -> this.add days: - this.getWeekday()
 
 Date::firstInMonth = -> this.add days: 1 - this.getDate()
 
-#  if require.main is module
-#    d1 = new Date
-#    d2 = Date.normalizedToday()
-#    d3 = d1.normalized()
-#    d4 = d1.add days: 3
-
-#    console.log d1.isSameLocalDay(d2) and d2.isSameLocalDay(d3)
-#    console.log d2.dateView()
-#    console.log d3.toDict()
-#    console.log d1, d2, d3
-#    console.log d1.isSameLocalDay(d4), d1, d4
-
-#    d5 = new Date '2011-08-19'
-#    console.log d5, d5.firstInMonth()
-
