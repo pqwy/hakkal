@@ -11,7 +11,7 @@ db = database
       user     : 'wiki'
       password : 'stonogA1.'
 
-model     = require('./model') db.client
+model     = require('./model') db
 
 
 fileSession = cc.phpFileSession
@@ -25,7 +25,7 @@ sqlSession = cc.mwSqlSession
                 key     : 'wikitoken'
                 table   : 'user'
                 keycol  : 'user_token'
-                client  : db.client
+                client  : db
                 mapping :
                     id   : 'user_id'
                     name : 'user_name'
@@ -45,7 +45,7 @@ require('zappa') '127.0.0.1', port, ->
     @enable 'serve jquery'
 
     @use @express.logger('dev'), 'bodyParser'
-    @use 'cookieParser', cookiesnatch, fileSession, sqlSession
+    @use 'cookieParser', fileSession, sqlSession
     @use @app.router, @express.static("#{__dirname}/../public")
 #      @use require('connect-assets')() ??
 
@@ -82,30 +82,24 @@ require('zappa') '127.0.0.1', port, ->
 
 
   @get '/': ->
-#      console.log @request.cookies
-    console.log @request.phpsession
+    console.log "finally, the foreign session:", @request.phpsession
     @render 'month'
-    @send 'desu'
-
-  @get '/ohwow': ->
-    m = model.forsession @request.phpsession
-    month = Number @params.month ? 0
-    m.monthFromNow month, (result) =>
-      @render 'month':
-                  monthname : 'listopad 2011'
-                  monthdata : result
 
   @coffee '/calendar.js': ->
-    $ ->
 
+    $ ->
       offset = 0
 
       loadCalendar = ->
-        $('#contents').empty()
         $.ajax "month/#{offset}",
           success: (data, status) ->
+            console.log data
             $('#monthname').text data.monthname
+            $('#yearname').text data.year
+            $('#contents').empty()
             $('#contents').append templates.month_template data.monthdata
+            $('#contents .available.future').click -> alert 'reg'
+            $('#contents .own.future').click -> alert 'unreg'
 
       $('#prev.strelica').click ->
         offset = offset - 1

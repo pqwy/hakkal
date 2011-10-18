@@ -14,19 +14,21 @@ exports.obmap = (ob, mapping) ->
     r[k1] = ob[k2] for own k1, k2 of mapping when ob[k2]?
   r
 
-exports.appendKeys = appendKeys = (from, to) ->
-  to[k] = v for own k, v of from
-  to
+#  exports.appendKeys = appendKeys = (from, to) ->
+#    to[k] = v for own k, v of from
+#    to
 
-exports.patch = (ob1, ob2) ->
-  r = {}
-  appendKeys ob1, r
-  appendKeys ob2, r
+#  exports.patch = (ob1, ob2) ->
+#    r = {}
+#    appendKeys ob1, r
+#    appendKeys ob2, r
 
 exports.logc = (stuff...) ->
   console.log.apply console,
     (util.inspect s, false, 2, true for s in stuff)
 
+exports.throwK = (k) -> (err, stuff...) ->
+  if err? then throw err else k stuff...
 
 # `foldl combine seed . sequence` for the cps monad.
 exports.collectk0 = collectk0 = (funs, next, combine, seed) ->

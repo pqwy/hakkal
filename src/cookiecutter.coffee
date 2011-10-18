@@ -1,6 +1,6 @@
 
-r  = require './rondom'
-fs = require 'fs'
+rondom = require './rondom'
+fs     = require 'fs'
 
 
 # Fetch a tuple from the given `table`, where the value of
@@ -12,14 +12,9 @@ exports.rawMwSqlSession = ({ key, keycol, table, client }) ->
 
   (req, res, next) ->
 
-#      console.log "on entry:", req.phpsession
-    return next() if req.phpsession?
     return next() unless (ssn = req.cookies[key])?
 
-    client.query q, [ssn], (err, [res], fields) ->
-
-      return next err if err?
-
+    client.query_t q, [ssn], ([res]) ->
       req.phpsession = res if res?
       next()
 
@@ -32,8 +27,6 @@ exports.rawPhpFileSession = ({ key, phpsessiondir }) ->
 
   (req, res, next) ->
 
-#      console.log "on entry:", req.phpsession
-    return next() if req.phpsession?
     return next() unless (ssn = req.cookies[key])?
 
     sessionfile = "#{phpsessiondir}/sess_#{ssn}"
@@ -62,7 +55,7 @@ parseSessionFile = (data) ->
 
 parsePayload = (raw) ->
 
-  rex = (re, f = r.identity, group = 1) ->
+  rex = (re, f = rondom.identity, group = 1) ->
     res = raw.match re
     res[group] if res?
 
@@ -72,13 +65,9 @@ parsePayload = (raw) ->
     else raw[2..]
 
 
-
 # Sanity: ensure session has the key `id` and that it doesn't
 # contain a zero.
-checkSession = (req) ->
-  s = req.phpsession
-  if (not s?) or (not s.id?) or (s.id? is 0)
-    delete req.phpsession
+checkSession = (s) -> s?.id? and s?.id isnt 0
 
 # Lots of helpless stuff here.
 import_session = (hf) -> (params) ->
@@ -86,14 +75,16 @@ import_session = (hf) -> (params) ->
   handler = hf params
   
   (req, res, next) ->
-    handler req, res, (err) ->
-      return next err if err?
-#        console.log "s pre:", req.phpsession
-      req.phpsession = r.obmap req.phpsession, params.mapping
-      checkSession req
-#        console.log "s post:", req.phpsession
-      next()
 
+    return next() if req.phpsession?.id?
+
+    handler req, res, (err) ->
+
+      return next err if err?
+
+      s = rondom.obmap req.phpsession, params.mapping
+      if checkSession s then req.phpsession = s else delete req.phpsession
+      next()
 
 exports.mwSqlSession   = import_session exports.rawMwSqlSession
 
