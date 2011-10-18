@@ -27,7 +27,7 @@ monthdays = (date0) ->
     date = date.add days: 7
     day
 
-resolveday = (client, userid, date, next) ->
+resolveday = (client, { userid, target, now, refmonth }, next) ->
 
   q = """
     select c.calendar_day, u.user_id, u.user_name, u.user_real_name
@@ -36,12 +36,10 @@ resolveday = (client, userid, date, next) ->
     where c.calendar_day = ?
   """
 
-  today = Date.normalizedToday()
-
-  client.query_t q, [ date.localeISODateString() ], ([res]) ->
+  client.query_t q, [ target.localeISODateString() ], ([res]) ->
 
     r =
-      day: date.toDict()
+      day: target.toDict()
 
     if res?
       [ r.user, r.name ] = [ res.user_name, res.user_real_name ]
@@ -49,21 +47,26 @@ resolveday = (client, userid, date, next) ->
     else
       r.status = 'available'
 
-    r.today   = true if date.isSameLocalDay today
-    r.distant = true if refmonth? and refmonth isnt date.getMonth()
-    r.future  = true if r.today? or date > today
+    r.today   = true if target.isSameLocalDay now
+    r.distant = true if refmonth? and refmonth isnt target.getMonth()
+    r.future  = true if r.today? or target > now
 
-    if date.getWeekday() in [5, 6] then r.status = 'blocked'
+    if target.getWeekday() in [5, 6] then r.status = 'blocked'
 
     next r
 
-resolveweek = (client, userid, reference, next) ->
-  aux = (day, k) -> resolveday client, userid, day, k
-  rondom.collectk1 aux, (weekdays reference), next
+resolveweek = (client, context, next) ->
+  aux = (day, k) ->
+    context.target = day
+    resolveday client, context, k
+  rondom.collectk1 aux, (weekdays context.target), next
 
-resolvemonth = (client, userid, reference, next) ->
-  aux = (monday, k) -> resolveweek client, userid, monday, k
-  rondom.collectk1 aux, (monthdays reference), next
+resolvemonth = (client, context, next) ->
+  context.refmonth = context.target.getMonth()
+  aux = (monday, k) ->
+    context.target = monday
+    resolveweek client, context, k
+  rondom.collectk1 aux, (monthdays context.target), next
 
 module.exports = (client) ->
 
@@ -73,21 +76,21 @@ module.exports = (client) ->
 
     weekFromNow = (offset, next) ->
 
-      now       = Date.normalizedToday()
-      reference = now.add months: offset
+      now    = Date.normalizedToday()
+      target = now.add months: offset
 
-      resolveweek client, userid, reference, next
+      resolveweek client, { userid, target, now }, next
 
     monthFromNow = (offset, next) ->
 
-      now       = Date.normalizedToday()
-      reference = now.add months: offset
+      now    = Date.normalizedToday()
+      target = now.add months: offset
 
-      resolvemonth client, userid, reference, (monthdata) ->
+      resolvemonth client, { userid, target, now }, (monthdata) ->
         next
           monthdata : monthdata
-          year      : reference.getFullYear()
-          monthname : reference.monthname()
+          year      : target.getFullYear()
+          monthname : target.monthname()
 
     { weekFromNow, monthFromNow }
 
