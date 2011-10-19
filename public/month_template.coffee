@@ -17,7 +17,8 @@ for week in month
               when 'blocked'     then [d.status    , 'noway'  , ''    ]
               when 'available'   then [d.status    , 'action' , ''    ]
 
-          spec =        ".#{outer}"
+          spec = "##{d.day.year}-#{d.day.month}-#{d.day.day}"
+          spec = spec + ".#{outer}"
           spec = spec + '.future'      if d.future?
           spec = spec + '.current'     if d.today?
           spec =        '.unimportant' if d.distant?

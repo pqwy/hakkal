@@ -24,9 +24,9 @@ Date.normalizedToday = -> (new Date).normalized()
 
 Date::add = ({ years, months, days }) ->
   this.mod_copy (d) ->
-    d.setFullYear d.getYear()  + years  if years?
-    d.setMonth    d.getMonth() + months if months?
-    d.setDate     d.getDate()  + days   if days?
+    d.setFullYear d.getFullYearYear() + years  if years?
+    d.setMonth    d.getMonth()        + months if months?
+    d.setDate     d.getDate()         + days   if days?
 
 Date::getWeekday = ->
   weekday = this.getDay()

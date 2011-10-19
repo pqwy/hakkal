@@ -34,6 +34,10 @@ cookiesnatch = (req, res, next) ->
   rondom.logc req.cookies if req.cookies?
   next()
 
+sessionModel = (req, res, next) ->
+  req.model = model.forsession req.phpsession
+  next()
+
 
 require('zappa') '127.0.0.1', port, ->
 
@@ -45,7 +49,7 @@ require('zappa') '127.0.0.1', port, ->
     @enable 'serve jquery'
 
     @use @express.logger('dev'), 'bodyParser'
-    @use 'cookieParser', fileSession, sqlSession
+    @use 'cookieParser', fileSession, sqlSession, sessionModel
     @use @app.router, @express.static("#{__dirname}/../public")
 #      @use require('connect-assets')() ??
 
@@ -58,28 +62,21 @@ require('zappa') '127.0.0.1', port, ->
       @user 'errorHandler', 'staticCache'
 
 
-#    @app.param 'offset', (req, res, next, offset) ->
-#      console.log "HOOK"
-#      o = Number req.params.offset
-#      req.params.offset = if o? and not o is NaN then o else 0
-#      next()
+  @app.param 'offset', (req, res, next, offset) ->
+    req.params.offset = o = Number req.params.offset
+    req.params.offset = 0 if isNaN o
+    next()
 
-  dispatchRelative = (meth) ->
-    m = model.forsession @request.phpsession
-    offset = Number @params.offset ? 0
-    m[meth] offset, (result) => @send result
 
   @get '/week/:offset?': ->
-#      m = model.forsession @request.phpsession
-#      console.log @params.offset, @request.params.offset
-#      m.weekFromNow @params.offset, (r) => @send r
-    dispatchRelative.call this, 'weekFromNow'
+    @request.model.weekFromNow @params.offset, (res) => @send res
 
   @get '/month/:offset?': ->
-#      m = model.forsession @request.phpsession
-#      m.monthFromNow @params.offset, (r) => @send r
-    dispatchRelative.call this, 'monthFromNow'
+    @request.model.monthFromNow @params.offset, (res) => @send res
 
+  @post '/toggle/:isoday': ->
+    next 'user unknown' if not @request.phpsession?.id?
+    @request.model.toggle @params.isoday, => @send ''
 
   @get '/': ->
     console.log "finally, the foreign session:", @request.phpsession
@@ -96,10 +93,14 @@ require('zappa') '127.0.0.1', port, ->
             console.log data
             $('#monthname').text data.monthname
             $('#yearname').text data.year
+
             $('#contents').empty()
             $('#contents').append templates.month_template data.monthdata
-            $('#contents .available.future').click -> alert 'reg'
-            $('#contents .own.future').click -> alert 'unreg'
+
+            $('#contents .available.future, #contents .own.future').click ->
+              $.ajax "toggle/#{@id}",
+                type    : 'POST'
+                success : (data, status) -> loadCalendar()
 
       $('#prev.strelica').click ->
         offset = offset - 1

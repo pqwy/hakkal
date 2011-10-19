@@ -29,12 +29,12 @@ monthdays = (date0) ->
 
 resolveday = (client, { userid, target, now, refmonth }, next) ->
 
-  q = """
+  q = '''
     select c.calendar_day, u.user_id, u.user_name, u.user_real_name
     from calendar_thingie as c
     left join user as u on c.calendar_user = u.user_id
     where c.calendar_day = ?
-  """
+  '''
 
   client.query_t q, [ target.localeISODateString() ], ([res]) ->
 
@@ -68,11 +68,43 @@ resolvemonth = (client, context, next) ->
     resolveweek client, context, k
   rondom.collectk1 aux, (monthdays context.target), next
 
+toggleuser = (client, { userid, target, now }, next) ->
+
+  q1 = '''select calendar_user from calendar_thingie where calendar_day = ?'''
+  q2 = '''delete from calendar_thingie
+          where calendar_user = ? and calendar_day = ?'''
+  q3 = '''insert into calendar_thingie (calendar_user, calendar_day)
+          values (?,?)
+          on duplicate key update calendar_user = values (calendar_user)'''
+
+  return next 'Too late....' if target < now
+
+  day = target.localeISODateString()
+
+  clearuser = -> client.query_t q2, [userid, day], -> next()
+  setuser   = -> client.query_t q3, [userid, day], -> next()
+
+
+  client.query_t q1, [day], (res) ->
+    if not res[0]?
+      console.log "#{day} seems empty, setting to #{userid}."
+      setuser()
+    else
+      { calendar_user } = res[0]
+      if calendar_user is userid
+      	console.log "#{day} seems owned by #{userid}, clearing."
+      	clearuser()
+      else
+      	console.log "#{day} is owned by #{calendar_user}, not #{userid}, no go."
+      	next "Taken."
+
 module.exports = (client) ->
 
   forsession = (ssn) ->
 
-    userid = Number ssn?.id
+    console.log "model - forsession", ssn
+
+    userid = Number ssn.id if ssn?.id?
 
     weekFromNow = (offset, next) ->
 
@@ -92,7 +124,16 @@ module.exports = (client) ->
           year      : target.getFullYear()
           monthname : target.monthname()
 
-    { weekFromNow, monthFromNow }
+    toggle = (isoday, next) ->
+
+      return next "I don't know you." unless userid?
+
+      now    = Date.normalizedToday()
+      target = new Date isoday
+
+      toggleuser client, { userid, target, now }, next
+
+    { weekFromNow, monthFromNow, toggle }
 
   { forsession }
 
