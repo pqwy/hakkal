@@ -9,18 +9,20 @@ window.monthcalendar = ({ contents, prev, next, monthname, yearname }) ->
 
   load = ->
 
-    $.ajax "month/#{offset}",
+    $.ajax "month/relative/#{offset}",
       success: (data, status) ->
 
         $(monthname).text data.monthname if monthname?
         $(yearname).text data.year       if yearname?
 
         $(contents).empty().append templates['calendar-month-template'] data.monthdata
-        $(contents).find('.available.future, .own.future').click ->
 
-          $.ajax "toggle/#{@id}",
-            type    : 'POST'
-            success : (data, status) -> load()
+        if data.authenticated
+          $(contents).find('.available.future, .own.future').click ->
+
+            $.ajax "toggle-ownership/#{@id}",
+              type    : 'POST'
+              success : load
 
   load()
 

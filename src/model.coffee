@@ -86,23 +86,15 @@ toggleuser = (client, { userid, target, now }, next) ->
 
 
   client.query_t q1, [day], (res) ->
-    if not res[0]?
-      console.log "#{day} seems empty, setting to #{userid}."
-      setuser()
+    if not res[0]? then setuser()
     else
       { calendar_user } = res[0]
-      if calendar_user is userid
-      	console.log "#{day} seems owned by #{userid}, clearing."
-      	clearuser()
-      else
-      	console.log "#{day} is owned by #{calendar_user}, not #{userid}, no go."
-      	next "Taken."
+      if calendar_user is userid then clearuser()
+      else next "Taken."
 
 module.exports = (client) ->
 
   forsession = (ssn) ->
-
-    console.log "model - forsession", ssn
 
     userid = Number ssn.id if ssn?.id?
 
@@ -111,7 +103,9 @@ module.exports = (client) ->
       now    = Date.normalizedToday()
       target = now.add months: offset
 
-      resolveweek client, { userid, target, now }, next
+      resolveweek client, { userid, target, now }, (weekdata) ->
+        weekdata.authenticated = userid?
+        next weekdata
 
     monthFromNow = (offset, next) ->
 
@@ -120,13 +114,14 @@ module.exports = (client) ->
 
       resolvemonth client, { userid, target, now }, (monthdata) ->
         next
-          monthdata : monthdata
-          year      : target.getFullYear()
-          monthname : target.monthname()
+          monthdata     : monthdata
+          year          : target.getFullYear()
+          monthname     : target.monthname()
+          authenticated : userid?
 
     toggle = (isoday, next) ->
 
-      return next "I don't know you." unless userid?
+      throw Error "session unauth'd" unless userid?
 
       now    = Date.normalizedToday()
       target = new Date isoday

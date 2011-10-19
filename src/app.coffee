@@ -38,7 +38,6 @@ session2model = (req, res, next) ->
 
 require('zappa') '127.0.0.1', port, ->
 
-
   @configure =>
 
     @set 'views': "#{__dirname}/../views"
@@ -60,22 +59,29 @@ require('zappa') '127.0.0.1', port, ->
       @user 'errorHandler', 'staticCache'
 
 
+  @get '/week/relative/:offset': ->
+    @request.model.weekFromNow @params.offset, (res) => @send res
+
+  @get '/month/relative/:offset': ->
+    @request.model.monthFromNow @params.offset, (res) => @send res
+
+  @post '/toggle-ownership/:isoday': ->
+    @authenticated =>
+      @request.model.toggle @params.isoday, => @send ''
+
+  @get '/': ->
+    console.log "finally, the foreign session:", @request.phpsession
+    @render 'month'
+
+
   @app.param 'offset', (req, res, next, offset) ->
     req.params.offset = o = Number req.params.offset
     req.params.offset = 0 if isNaN o
     next()
 
+  @helper authenticated: (f) ->
+    if not @request.phpsession?
+      @response.writeHead 401, 'content-type': 'text/plain'
+      @response.end 'Not authenticated...\n'
+    else f()
 
-  @get '/week/:offset': ->
-    @request.model.weekFromNow @params.offset, (res) => @send res
-
-  @get '/month/:offset': ->
-    @request.model.monthFromNow @params.offset, (res) => @send res
-
-  @post '/toggle/:isoday': ->
-    next 'user unknown' if not @request.phpsession?.id?
-    @request.model.toggle @params.isoday, => @send ''
-
-  @get '/': ->
-    console.log "finally, the foreign session:", @request.phpsession
-    @render 'month'
