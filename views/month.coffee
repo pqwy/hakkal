@@ -2,6 +2,11 @@
 @title       = 'Kalendar!'
 @stylesheets = ['calendar']
 @scripts     = ['zappa/jquery', 'calendar', 'calendar-month-template']
+@coffee      = ->
+  $ -> monthcalendar
+        contents  : '#contents'
+        prev      : '#prev.strelica', next      : '#next.strelica'
+        monthname : '#monthname'    , yearname  : '#yearname'
 
 
 div id: 'container', ->

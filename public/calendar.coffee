@@ -1,29 +1,26 @@
 
-$ ->
+
+window.monthcalendar = ({ contents, prev, next, monthname, yearname }) ->
+
   offset = 0
 
-  loadCalendar = ->
+  $(prev).click(-> offset -= 1; load()) if prev?
+  $(next).click(-> offset += 1; load()) if next?
+
+  load = ->
+
     $.ajax "month/#{offset}",
       success: (data, status) ->
-        console.log data
-        $('#monthname').text data.monthname
-        $('#yearname').text data.year
 
-        $('#contents').empty()
-        $('#contents').append templates['calendar-month-template'] data.monthdata
+        $(monthname).text data.monthname if monthname?
+        $(yearname).text data.year       if yearname?
 
-        $('#contents .available.future, #contents .own.future').click ->
+        $(contents).empty().append templates['calendar-month-template'] data.monthdata
+        $(contents).find('.available.future, .own.future').click ->
+
           $.ajax "toggle/#{@id}",
             type    : 'POST'
-            success : (data, status) -> loadCalendar()
+            success : (data, status) -> load()
 
-  $('#prev.strelica').click ->
-    offset = offset - 1
-    loadCalendar()
-
-  $('#next.strelica').click ->
-    offset = offset + 1
-    loadCalendar()
-
-  loadCalendar()
+  load()
 

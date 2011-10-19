@@ -1,4 +1,6 @@
 
+# client-side view
+
 month = this
 
 for week in month
