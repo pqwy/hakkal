@@ -30,11 +30,8 @@ sqlSession = cc.mwSqlSession
                     id   : 'user_id'
                     name : 'user_name'
 
-cookiesnatch = (req, res, next) ->
-  rondom.logc req.cookies if req.cookies?
-  next()
 
-sessionModel = (req, res, next) ->
+session2model = (req, res, next) ->
   req.model = model.forsession req.phpsession
   next()
 
@@ -49,9 +46,10 @@ require('zappa') '127.0.0.1', port, ->
     @enable 'serve jquery'
 
     @use @express.logger('dev'), 'bodyParser'
-    @use 'cookieParser', fileSession, sqlSession, sessionModel
-    @use @app.router, @express.static("#{__dirname}/../public")
-#      @use require('connect-assets')() ??
+    @use 'cookieParser', fileSession, sqlSession, session2model
+    @use @app.router 
+#      @use require('connect-assets')()
+    @use @express.static("#{__dirname}/../public")
 
   @configure
 
@@ -68,10 +66,10 @@ require('zappa') '127.0.0.1', port, ->
     next()
 
 
-  @get '/week/:offset?': ->
+  @get '/week/:offset': ->
     @request.model.weekFromNow @params.offset, (res) => @send res
 
-  @get '/month/:offset?': ->
+  @get '/month/:offset': ->
     @request.model.monthFromNow @params.offset, (res) => @send res
 
   @post '/toggle/:isoday': ->
@@ -81,34 +79,3 @@ require('zappa') '127.0.0.1', port, ->
   @get '/': ->
     console.log "finally, the foreign session:", @request.phpsession
     @render 'month'
-
-  @coffee '/calendar.js': ->
-
-    $ ->
-      offset = 0
-
-      loadCalendar = ->
-        $.ajax "month/#{offset}",
-          success: (data, status) ->
-            console.log data
-            $('#monthname').text data.monthname
-            $('#yearname').text data.year
-
-            $('#contents').empty()
-            $('#contents').append templates.month_template data.monthdata
-
-            $('#contents .available.future, #contents .own.future').click ->
-              $.ajax "toggle/#{@id}",
-                type    : 'POST'
-                success : (data, status) -> loadCalendar()
-
-      $('#prev.strelica').click ->
-        offset = offset - 1
-        loadCalendar()
-
-      $('#next.strelica').click ->
-        offset = offset + 1
-        loadCalendar()
-
-      loadCalendar()
-

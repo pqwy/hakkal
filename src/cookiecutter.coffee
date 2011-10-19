@@ -3,9 +3,9 @@ rondom = require './rondom'
 fs     = require 'fs'
 
 
-# Fetch a tuple from the given `table`, where the value of
-# `keycol` is the payload of cookie named `key`, on mysql
-# connection `client`, and store that as `req.phpsession`.
+# Fetch a tuple from the given `table`, where the value of `keycol` is the
+# payload of cookie named `key`, on mysql connection `client`, and store that
+# as `req.phpsession`.
 exports.rawMwSqlSession = ({ key, keycol, table, client }) ->
 
   q = "select * from #{table} where #{keycol} = ?"
@@ -18,9 +18,9 @@ exports.rawMwSqlSession = ({ key, keycol, table, client }) ->
       req.phpsession = res if res?
       next()
 
-# Fetch the content of file `sess_FOO` in `phpsessiondir`,
-# where FOO is the payload of cookie `key`, decode its
-# obscure format and stick it in `req.phpsession`.
+# Fetch the content of file `sess_FOO` in `phpsessiondir`, where FOO is the
+# payload of cookie `key`, decode its obscure format and stick it in
+# `req.phpsession`.
 exports.rawPhpFileSession = ({ key, phpsessiondir }) ->
 
   fs.readdirSync phpsessiondir
@@ -65,8 +65,7 @@ parsePayload = (raw) ->
     else raw[2..]
 
 
-# Sanity: ensure session has the key `id` and that it doesn't
-# contain a zero.
+# Sanity: ensure session has the key `id` and that it doesn't contain a zero.
 checkSession = (s) -> s?.id? and s?.id isnt 0
 
 # Lots of helpless stuff here.

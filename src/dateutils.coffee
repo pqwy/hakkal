@@ -1,5 +1,5 @@
 
-daynames   = ['Ned', 'Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub']
+daynames   = [ 'Ned', 'Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub' ]
 
 Date.dayname  = (ix) -> daynames[ix]
 Date::dayname = -> Date.dayname this.getDay()
