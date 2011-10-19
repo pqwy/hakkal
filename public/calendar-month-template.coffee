@@ -27,7 +27,7 @@ for week in month
           div spec, ->
 
             text "#{d.day.day} "
-            span class: 'dayname', "| #{d.day.dayname} |"
+            span class: 'dayname', "| #{d.day.name} |"
             text " #{d.user ? ''}"
 
             (div class: 'noway') if d.status == 'own'

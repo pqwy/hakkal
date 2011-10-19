@@ -59,6 +59,8 @@ require('zappa') '127.0.0.1', port, ->
       @user 'errorHandler', 'staticCache'
 
 
+  @get '/': -> @render 'month'
+
   @get '/week/relative/:offset': ->
     @request.model.weekFromNow @params.offset, (res) => @send res
 
@@ -68,10 +70,6 @@ require('zappa') '127.0.0.1', port, ->
   @post '/toggle-ownership/:isoday': ->
     @authenticated =>
       @request.model.toggle @params.isoday, => @send ''
-
-  @get '/': ->
-    console.log "finally, the foreign session:", @request.phpsession
-    @render 'month'
 
 
   @app.param 'offset', (req, res, next, offset) ->
