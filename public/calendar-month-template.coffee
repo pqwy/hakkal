@@ -10,12 +10,11 @@ for week in month
         li ->
 
           [outer, inner, info] =
-
             switch d.status
-              when 'taken'       then [d.status    , 'info'   , d.name]
-              when 'own'         then ['taken.own' , 'info'   , d.name]
-              when 'blocked'     then [d.status    , 'noway'  , ''    ]
-              when 'available'   then [d.status    , 'action' , ''    ]
+              when 'taken'     then [d.status    , 'info'   , d.name]
+              when 'own'       then ['taken.own' , 'info'   , d.name]
+              when 'blocked'   then [d.status    , 'noway'  , ''    ]
+              when 'available' then [d.status    , 'action' , ''    ]
 
           spec = "##{d.day.year}-#{d.day.month}-#{d.day.day}"
           spec = spec + ".#{outer}"

@@ -1,7 +1,7 @@
 
 @title       = 'Kalendar!'
 @stylesheets = ['calendar']
-@scripts     = ['zappa/jquery', 'month_template', 'calendar']
+@scripts     = ['zappa/jquery', 'calendar', 'calendar-month-template']
 
 
 div id: 'container', ->
