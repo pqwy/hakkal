@@ -1,6 +1,5 @@
 
-
-window.monthcalendar = ({ contents, prev, next, monthname, yearname }) ->
+window.monthcalendar = ({ contents, prev, next, monthname, yearname, authcheck }) ->
 
   offset = 0
 
@@ -17,7 +16,7 @@ window.monthcalendar = ({ contents, prev, next, monthname, yearname }) ->
 
         $(contents).empty().append templates['calendar-month-template'] data.monthdata
 
-        if data.authenticated
+        if authcheck? and authcheck()
           $(contents).find('.available.future, .own.future').click ->
 
             $.ajax "toggle-ownership/#{@id}",

@@ -103,9 +103,7 @@ module.exports = (client) ->
       now    = Date.normalizedToday()
       target = now.add months: offset
 
-      resolveweek client, { userid, target, now }, (weekdata) ->
-        weekdata.authenticated = userid?
-        next weekdata
+      resolveweek client, { userid, target, now }, next
 
     monthFromNow = (offset, next) ->
 
@@ -117,7 +115,6 @@ module.exports = (client) ->
           monthdata     : monthdata
           year          : target.getFullYear()
           monthname     : target.monthname()
-          authenticated : userid?
 
     toggle = (isoday, next) ->
 

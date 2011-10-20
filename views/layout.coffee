@@ -1,14 +1,24 @@
+
+inject = (stuff, mapper) -> mapper item for item in stuff if stuff?
+
 doctype 5
+
 html ->
   head ->
     title @title if @title?
-    if @scripts?
-      script {src: "#{s}.js"} for s in @scripts
-    if @stylesheets?
-      link { rel: 'stylesheet', type: "text/css", href: "#{s}.css" } for s in @stylesheets
-    if @coffees?
-      coffeescript c for c in @coffees
+
+    inject @metas, meta
+
+    inject @scripts, (s) ->
+      script src: if /^http/.test s then s else "#{s}.js"
+
+    inject @stylesheets, (s) ->
+      link rel: 'stylesheet', type: "text/css", href: "#{s}.css"
+
+    inject @coffees, coffeescript
+
     coffeescript @coffee if @coffee?
+
   body @body
 
 
