@@ -16,16 +16,19 @@ weekdays = (date0) ->
 # A monday for each week overlapping this month.
 monthdays = (date0) ->
 
-  [month, year] = [date0.getMonth(), date0.getYear()]
+  { month: month0, year: year0 } = date0.dateView()
 
   date = (new Date date0).firstInMonth().firstInWeek()
 
-  while ( date.getYear() < year or
-            date.getMonth() <= month and date.getYear() is year )
+  loop
 
-    day  = new Date date
-    date = date.add days: 7
-    day
+    { day, month, year } = date.dateView()
+    break unless year < year0 or month <= month0 and year is year0
+
+    element = new Date date
+    date    = date.add days: 7
+    element
+
 
 resolveday = (client, { userid, target, now, refmonth }, next) ->
 
@@ -47,9 +50,9 @@ resolveday = (client, { userid, target, now, refmonth }, next) ->
     else
       r.status = 'available'
 
-    r.today   = true if target.isSameLocalDay now
-    r.distant = true if refmonth? and refmonth isnt target.getMonth()
-    r.future  = true if r.today? or target > now
+    r.today   = on if target.isSameLocalDay now
+    r.distant = on if refmonth? and refmonth isnt target.getMonth()
+    r.future  = on if r.today? or target > now
 
     if target.getWeekday() in [5, 6] then r.status = 'blocked'
 
@@ -77,20 +80,20 @@ toggleuser = (client, { userid, target, now }, next) ->
           values (?,?)
           on duplicate key update calendar_user = values (calendar_user)'''
 
-  return next 'Too late....' if target < now
+  return next 'Too late.' if target.dateCmp() < now.dateCmp()
 
   day = target.localeISODateString()
 
   clearuser = -> client.query_t q2, [userid, day], -> next()
   setuser   = -> client.query_t q3, [userid, day], -> next()
 
-
   client.query_t q1, [day], (res) ->
     if not res[0]? then setuser()
     else
       { calendar_user } = res[0]
       if calendar_user is userid then clearuser()
-      else next "Taken."
+      else next 'Not yours.'
+
 
 module.exports = (client) ->
 
@@ -123,7 +126,8 @@ module.exports = (client) ->
       now    = Date.normalizedToday()
       target = new Date isoday
 
-      toggleuser client, { userid, target, now }, next
+      toggleuser client, { userid, target, now }, (res) ->
+        next if res? then { ok: off, wat: res } else { ok: on }
 
     { weekFromNow, monthFromNow, toggle }
 

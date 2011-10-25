@@ -70,7 +70,7 @@ require('zappa') '127.0.0.1', port, ->
 
   @post '/toggle-ownership/:isoday': ->
     @authenticated =>
-      @request.model.toggle @params.isoday, => @send ''
+      @request.model.toggle @params.isoday, (res) => @send res
 
 
   @app.param 'offset', (req, res, next, offset) ->

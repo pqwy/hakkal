@@ -12,18 +12,18 @@ Date.monthname  = (ix) -> monthnames[ix]
 Date::monthname = -> Date.monthname @getMonth()
 
 
-Date::mod_copy = (fun) ->
+Date::mut_copy = (fun) ->
   d = new Date this
   fun d
   d
 
-Date::normalized = ->
-  @mod_copy (d) -> d.setHours 0; d.setMinutes 0; d.setSeconds 0
+Date::normalizedDate = ->
+  @mut_copy (d) -> d.setHours 0; d.setMinutes 0; d.setSeconds 0
 
-Date.normalizedToday = -> (new Date).normalized()
+Date.normalizedToday = -> (new Date).normalizedDate()
 
 Date::add = ({ years, months, days }) ->
-  @mod_copy (d) ->
+  @mut_copy (d) ->
     d.setFullYear d.getFullYearYear() + years  if years?
     d.setMonth    d.getMonth()        + months if months?
     d.setDate     d.getDate()         + days   if days?
@@ -36,6 +36,10 @@ Date::dateView = ->
   year  : @getFullYear()
   month : @getMonth() + 1
   day   : @getDate()
+
+Date::dateCmp = ->
+  { year, month, day } = @dateView()
+  day + month * 100 + year * 10000
 
 Date::toDict = ->
 
