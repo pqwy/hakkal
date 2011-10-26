@@ -29,7 +29,6 @@ monthdays = (date0) ->
     date    = date.add days: 7
     element
 
-
 resolveday = (client, { userid, target, now, refmonth }, next) ->
 
   q = '''
@@ -87,19 +86,27 @@ toggleuser = (client, { userid, target, now }, next) ->
   clearuser = -> client.query_t q2, [userid, day], -> next()
   setuser   = -> client.query_t q3, [userid, day], -> next()
 
-  client.query_t q1, [day], (res) ->
-    if not res[0]? then setuser()
+  client.query_t q1, [day], ([res]) ->
+    if not res? then setuser()
     else
-      { calendar_user } = res[0]
+      { calendar_user } = res
       if calendar_user is userid then clearuser()
       else next 'Not yours.'
 
+resolveUser = (client, userid, next) ->
+
+  q = '''select user_name from user where user_id = ?'''
+
+  client.query_t q, [userid], ([{ user_name }]) -> next user_name
 
 module.exports = (client) ->
 
   forsession = (ssn) ->
 
     userid = Number ssn.id if ssn?.id?
+
+    userName = (next) ->
+      if userid? then resolveUser client, userid, next else next()
 
     weekFromNow = (offset, next) ->
 
@@ -129,7 +136,7 @@ module.exports = (client) ->
       toggleuser client, { userid, target, now }, (res) ->
         next if res? then { ok: off, wat: res } else { ok: on }
 
-    { weekFromNow, monthFromNow, toggle }
+    { userName, weekFromNow, monthFromNow, toggle }
 
   { forsession }
 

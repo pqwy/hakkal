@@ -1,5 +1,5 @@
 
-window.monthcalendar = ({ contents, prev, next, monthname, yearname, wait, authcheck }) ->
+window.monthcalendar = ({ contents, prev, next, monthname, yearname, onhold, authcheck }) ->
 
   offset = 0
 
@@ -8,12 +8,13 @@ window.monthcalendar = ({ contents, prev, next, monthname, yearname, wait, authc
     $(prev).data delta: -1
     $(next).data delta:  1
 
-    $(prev).add(next).click ->
-      $(wait).show()
-      offset += $(this).data 'delta'
-      load -> $(wait).hide()
+    toggle = -> $(contents).add(onhold).toggle()
+    reload = if not onhold? then load else -> toggle(); load andThen: toggle
 
-  load = (posthook) ->
+    $(prev).add(next).click ->
+      offset += $(this).data 'delta'; reload()
+
+  load = ({ andThen: posthook} = {}) ->
 
     $.ajax "month/relative/#{offset}",
       success: (data, status) ->
@@ -31,7 +32,7 @@ window.monthcalendar = ({ contents, prev, next, monthname, yearname, wait, authc
 
             $.ajax "toggle-ownership/#{@id}",
               type    : 'POST'
-              success : load
+              success : -> load()
 
         posthook() if posthook?
 

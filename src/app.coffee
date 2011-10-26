@@ -60,7 +60,10 @@ require('zappa') '127.0.0.1', port, ->
 
 
   @get '/': ->
-    @render 'month': authenticated: @request.phpsession?.id?
+    @request.model.userName (name) => @render
+      'month':
+        authenticated : @request.phpsession?.id?
+        name          : name
 
   @get '/week/relative/:offset': ->
     @request.model.weekFromNow @params.offset, (res) => @send res

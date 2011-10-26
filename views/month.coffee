@@ -1,9 +1,8 @@
 
-jqui = "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"
-
 @title       = 'Kalendar!'
 @stylesheets = ['calendar']
 @scripts     = ['zappa/jquery', 'calendar', 'calendar-month-template']
+@metas       = [sponsored: 'yup']  if @authenticated
 @coffee      = ->
 
   $ -> monthcalendar
@@ -11,20 +10,15 @@ jqui = "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"
         contents  : '#contents'
         prev      : '#prev.strelica', next      : '#next.strelica'
         monthname : '#monthname'    , yearname  : '#yearname'
-        wait      : '#wait'
+        onhold    : '#on-hold'
 
         authcheck : -> $('meta[sponsored]').length isnt 0
-
-@metas       = [sponsored: 'yup']  if @authenticated
-
-
-div id: 'wait', style: 'display: none', '...'
 
 div id: 'container', ->
 
   div id: 'subcontainer', ->
 
-    div id: 'logo'
+    a href: '/', -> div id: 'logo'
 
     h5 id: 'title', ->
 
@@ -34,7 +28,16 @@ div id: 'container', ->
       div class: 'strelica', id: 'next'
       text '|'
 
+    text '&nbsp;&nbsp;'
+    if @authenticated
+      div class: 'loggedin', @name
+    else
+      a href: 'https://wiki.razmjenavjestina.org/index.php?title=Special:UserLogin', ->
+        div class: 'notloggedin', 'anonymous'
+
   div class: 'underline'
 
   div id: 'contents'
+
+  div id: 'on-hold', style: 'display: none', '...'
 
