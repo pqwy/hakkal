@@ -11,11 +11,14 @@ jqui = "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"
         contents  : '#contents'
         prev      : '#prev.strelica', next      : '#next.strelica'
         monthname : '#monthname'    , yearname  : '#yearname'
+        wait      : '#wait'
 
         authcheck : -> $('meta[sponsored]').length isnt 0
 
 @metas       = [sponsored: 'yup']  if @authenticated
 
+
+div id: 'wait', style: 'display: none', '...'
 
 div id: 'container', ->
 

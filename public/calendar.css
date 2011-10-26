@@ -15,6 +15,7 @@
     -moz-transform: rotate(360deg);
   }
 }
+
 .schpinner {
     display:inline-block;
     background-image:url(schpinner2.png);
@@ -199,4 +200,21 @@ li {
    -webkit-box-shadow: 0 -2px 7px #CBCBCB;
    -moz-box-shadow: 0 -2px 7px #CBCBCB;
     box-shadow: 0 -2px 7px #CBCBCB;
+}
+
+.spinalone {
+   -webkit-animation: schpinner 0.8s linear infinite;
+   -moz-animation: schpinner 0.8s linear infinite;
+}
+
+#wait {
+    display: none;
+
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    padding: 10px;
+
+    background-color: #000;
+    color: #fff;
 }
