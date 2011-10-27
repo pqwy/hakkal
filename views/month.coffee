@@ -8,9 +8,8 @@
   $ -> monthcalendar
 
         contents  : '#contents'
-        prev      : '#prev.strelica', next      : '#next.strelica'
-        monthname : '#monthname'    , yearname  : '#yearname'
-        onhold    : '#on-hold'
+        monthname : '#monthname'
+        prev      : '#prev.strelica', next : '#next.strelica'
 
         authcheck : -> $('meta[sponsored]').length isnt 0
 
@@ -22,22 +21,20 @@ div id: 'container', ->
 
     h5 id: 'title', ->
 
-      text 'Kalendar za dežurstva &nbsp;|'
+      text 'Kalendar dežurstava |'
       div class: 'strelica', id: 'prev'
-      span id: 'monthname'; text '&nbsp;'; span id: 'yearname'; text '.'
+      span id: 'monthname'
       div class: 'strelica', id: 'next'
       text '|'
 
-    text '&nbsp;&nbsp;'
+    text '&nbsp'
     if @authenticated
       div class: 'loggedin', @name
     else
-      a href: 'https://wiki.razmjenavjestina.org/index.php?title=Special:UserLogin', ->
+      a href: '/index.php?title=Special:UserLogin', ->
         div class: 'notloggedin', 'anonymous'
 
   div class: 'underline'
 
   div id: 'contents'
-
-  div id: 'on-hold', style: 'display: none', '...'
 
