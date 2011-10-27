@@ -78,8 +78,10 @@ li {
     border-radius:3px;
     float: top-right;
     display:inline-block;
-    color:#555;
-    background-color:#CBE9CD;
+/*     color:#555;
+    background-color:#CBE9CD; */
+    color: #fff;
+    background-color: #444;
     padding:5px;
     vertical-align: 5px;
     margin:0px;
@@ -90,7 +92,8 @@ li {
     float: top-right;
     display:inline-block;
     color:#FFF;
-    background-color:#FF717B;
+/*     background-color:#FF717B; */
+    background-color: #444;
     padding:5px;
     vertical-align: 5px;
     margin:0px;
@@ -233,14 +236,17 @@ li {
 }
 
 #on-hold {
-    display: none;
-
     margin: 100px auto;
     padding: 10px;
-    width: 100px;
+    width: 150px;
     text-align: center;
     font-size: 40px;
 
     background-color: #000;
     color: #fff;
+
+    border-radius:3px;
+   -webkit-box-shadow: 0 2px 7px #CBCBCB;
+   -moz-box-shadow: 0 2px 7px #CBCBCB;
+    box-shadow: 0 2px 7px #CBCBCB;
 }
