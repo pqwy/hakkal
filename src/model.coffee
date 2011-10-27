@@ -133,6 +133,8 @@ module.exports = (client) ->
       now    = Date.normalizedToday()
       target = new Date isoday
 
+      return next { ok: off, wat: 'The fuck?' } if isNaN target.getTime()
+
       toggleuser client, { userid, target, now }, (res) ->
         next if res? then { ok: off, wat: res } else { ok: on }
 

@@ -1,7 +1,9 @@
 
 @title       = 'Kalendar!'
 @stylesheets = ['calendar']
-@scripts     = ['zappa/jquery', 'calendar', 'calendar-month-template']
+@scripts     = [ 'zappa/jquery', 'socket.io/socket.io', 'zappa/zappa'
+               , 'calendar', 'calendar-month-template'
+               ]
 @metas       = [sponsored: 'yup']  if @authenticated
 @coffee      = ->
 

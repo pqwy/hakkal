@@ -5,6 +5,7 @@ util      = require 'util'
 rondom    = require './rondom'
 cc        = require './cookiecutter'
 database  = require './database'
+client    = require './client'
 
 db = database
       database : 'wiki'
@@ -57,6 +58,7 @@ require('zappa') '127.0.0.1', port, ->
 
     production:  ->
       @user 'errorHandler', 'staticCache'
+      @enable 'minify'
 
 
   @get '/': ->
@@ -75,10 +77,11 @@ require('zappa') '127.0.0.1', port, ->
     @authenticated =>
       @request.model.toggle @params.isoday, (res) => @send res
 
+  @client '/calendar.js': client.fullcalendar
+
 
   @app.param 'offset', (req, res, next, offset) ->
-    req.params.offset = o = Number req.params.offset
-    req.params.offset = 0 if isNaN o
+    req.params.offset = if isNaN(o = Number req.params.offset) then 0 else o
     next()
 
   @helper authenticated: (f) ->
