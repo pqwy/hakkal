@@ -118,7 +118,12 @@ module.exports = (client) ->
     monthFromNow = (offset, next) ->
 
       now    = Date.normalizedToday()
-      target = now.add months: offset
+
+      # <-- FUGLY, but try setting the month of a date whose
+      #     day is 31 and see if it makes ANY FUCKING sense....
+      target = new Date now
+      target.setDate 1
+      target = target.add months: offset
 
       resolvemonth client, { userid, target, now }, (monthdata) ->
         next
