@@ -111,19 +111,14 @@ module.exports = (client) ->
     weekFromNow = (offset, next) ->
 
       now    = Date.normalizedToday()
-      target = now.add months: offset
+      target = now.add days: offset * 7
 
       resolveweek client, { userid, target, now }, next
 
     monthFromNow = (offset, next) ->
 
       now    = Date.normalizedToday()
-
-      # <-- FUGLY, but try setting the month of a date whose
-      #     day is 31 and see if it makes ANY FUCKING sense....
-      target = new Date now
-      target.setDate 1
-      target = target.add months: offset
+      target = now.firstInMonth().add months: offset
 
       resolvemonth client, { userid, target, now }, (monthdata) ->
         next
