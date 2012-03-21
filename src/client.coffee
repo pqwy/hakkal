@@ -2,7 +2,7 @@
 
 exports.fullcalendar = ->
 
-  window.monthcalendar = ({ contents, prev, next, monthname, authcheck }) =>
+  window.monthcalendar = ({ contents, prev, next, monthname, authcheck }) ->
 
     offset = 0
 
@@ -34,4 +34,5 @@ exports.fullcalendar = ->
                 success : load
 
     load()
+
 

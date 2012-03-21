@@ -81,7 +81,8 @@ require('zappa') '127.0.0.1', port, ->
 
 
   @app.param 'offset', (req, res, next, offset) ->
-    req.params.offset = if isNaN(o = Number req.params.offset) then 0 else o
+    if isNaN (req.params.offset = Number req.params.offset)
+      req.params.offset = 0
     next()
 
   @helper authenticated: (f) ->
